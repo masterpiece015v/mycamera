@@ -178,15 +178,16 @@ class Main2Activity : AppCompatActivity() {
 
             cursor.moveToFirst()
 
-            lateinit var path: String
-            lateinit var fileName: String
-            var size: Long
-
             do {
-                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
-                fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME))
-                val sizeColumn = cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)
-                size = cursor.getLong(sizeColumn)
+                val size = cursor.getLong( cursor.getColumnIndex(MediaStore.MediaColumns.SIZE) )
+
+                if( size == 0L ){
+                    continue
+                }
+
+                val path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
+                val fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME))
+
                 val id = cursor.getLong(cursor.getColumnIndex("_id"))
                 val thumbnail = MediaStore.Images.Thumbnails.getThumbnail(contentResolver, id, MediaStore.Images.Thumbnails.MICRO_KIND, null)
                 val item = ListItem(thumbnail, fileName, path, size)
@@ -203,7 +204,7 @@ class Main2Activity : AppCompatActivity() {
 
             setOnItemClickListener{parent, view, position, id ->
                 val item = parent.getItemAtPosition(position) as ListItem
-                Toast.makeText( applicationContext, item.path ,Toast.LENGTH_LONG ).show()
+                //Toast.makeText( applicationContext, item.path ,Toast.LENGTH_LONG ).show()
 
                 val intent = Intent().apply{
                     setClassName( "tokyo.mp015v.mycamera","tokyo.mp015v.mycamera.Main3Activity")
