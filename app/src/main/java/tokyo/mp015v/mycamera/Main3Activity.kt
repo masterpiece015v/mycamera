@@ -18,6 +18,9 @@ import android.widget.TextView
 import android.widget.Toast
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
@@ -39,7 +42,10 @@ class Main3Activity : AppCompatActivity() {
             .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
             .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
             .build()
-    
+    val realTimeOpts = FirebaseVisionFaceDetectorOptions.Builder()
+            .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
+            .build()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,21 +80,36 @@ class Main3Activity : AppCompatActivity() {
             }
         }
         val bitmap = BitmapFactory.decodeStream( inputStream ,null,options )
+        val image = FirebaseVisionImage.fromBitmap( bitmap )
+        val detector = FirebaseVision.getInstance()
+                .getVisionFaceDetector(highAccuracyOpts)
+        val result = detector.detectInImage( image )
+                .addOnSuccessListener{ faces->
+                    Log.d("debug","success")
+                    for( face in faces ){
+                        val bounds = face.boundingBox
+                        ///Log.d( "debug", bounds. )
+                        canvas.addRectPoint( bounds.left,bounds.top,bounds.right,bounds.bottom )
+                    }
+                    canvas.showCanvas()
+                }
+                .addOnFailureListener(object : OnFailureListener {
+                    override fun onFailure(e:Exception){
+                        Log.d("debug","failuer")
+                    }
+                })
 
-        //val bitmap = BitmapFactory.decodeStream( inputStream )
         val bitmapWidth = bitmap.width
         val bitmapHeight = bitmap.height
         val display = windowManager.defaultDisplay
         val displaySize = Point()
         display.getSize( displaySize )
-        //Log.d("debug","bitmap.byte="  + bitmap.byteCount)
+
         val scale = displaySize.x.toFloat() / bitmapWidth
 
-        //Log.d( "debug","scale:${scale}")
-
         newBitmap = Bitmap.createScaledBitmap(bitmap,(bitmapWidth * scale).toInt(),(bitmapHeight*scale).toInt(),false)
-        //Log.d("debut" , "newBitmap.byte=" + bitmap.byteCount )
-        //Log.d("debug","displaySize:${displaySize}")
+
+
 
         //キャンバスをタッチしたときのイベント
         canvas.setOnTouchListener { v, event ->
@@ -106,8 +127,8 @@ class Main3Activity : AppCompatActivity() {
         }
 
         //キャンバスに写真を表示する
-        canvas.showCanvas( newBitmap )
-
+        //canvas.showCanvas( newBitmap )
+        canvas.showCanvas( bitmap )
     }
     //Toolbarにtool_menuを追加する
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
