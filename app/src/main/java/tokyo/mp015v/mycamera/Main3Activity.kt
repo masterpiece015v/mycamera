@@ -18,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -32,6 +33,13 @@ class Main3Activity : AppCompatActivity() {
     val rects = Rects()
     lateinit var newBitmap : Bitmap
     lateinit var curPath : String
+
+    val highAccuracyOpts = FirebaseVisionFaceDetectorOptions.Builder()
+            .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+            .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+            .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+            .build()
+    
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
