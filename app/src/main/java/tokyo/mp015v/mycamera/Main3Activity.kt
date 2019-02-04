@@ -14,6 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.eclipsesource.json.Json
@@ -79,25 +80,8 @@ class Main3Activity : AppCompatActivity() {
                 inSampleSize = 1
             }
         }
-        val bitmap = BitmapFactory.decodeStream( inputStream ,null,options )
-        val image = FirebaseVisionImage.fromBitmap( bitmap )
-        val detector = FirebaseVision.getInstance()
-                .getVisionFaceDetector(highAccuracyOpts)
-        val result = detector.detectInImage( image )
-                .addOnSuccessListener{ faces->
-                    Log.d("debug","success")
-                    for( face in faces ){
-                        val bounds = face.boundingBox
-                        ///Log.d( "debug", bounds. )
-                        canvas.addRectPoint( bounds.left,bounds.top,bounds.right,bounds.bottom )
-                    }
-                    canvas.showCanvas()
-                }
-                .addOnFailureListener(object : OnFailureListener {
-                    override fun onFailure(e:Exception){
-                        Log.d("debug","failuer")
-                    }
-                })
+        //val bitmap = BitmapFactory.decodeStream( inputStream ,null,options )
+        val bitmap = BitmapFactory.decodeStream(inputStream)
 
         val bitmapWidth = bitmap.width
         val bitmapHeight = bitmap.height
@@ -109,8 +93,37 @@ class Main3Activity : AppCompatActivity() {
 
         newBitmap = Bitmap.createScaledBitmap(bitmap,(bitmapWidth * scale).toInt(),(bitmapHeight*scale).toInt(),false)
 
+        val image = FirebaseVisionImage.fromBitmap( newBitmap )
+
+        val detector = FirebaseVision.getInstance()
+                .getVisionFaceDetector(highAccuracyOpts)
+
+        val pro = findViewById<ProgressBar>(R.id.progressBar)
+        pro.max = 100;
+        pro.progress = 0
+        //pro.visibility = android.widget.ProgressBar.VISIBLE
+        findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
+
+        val result = detector.detectInImage( image )
+                .addOnSuccessListener{ faces->
+                    Log.d("debug","success")
+                    for( face in faces ){
+                        val bounds = face.boundingBox
+                        ///Log.d( "debug", bounds. )
+                        canvas.addRectPoint( bounds.left,bounds.top,bounds.right,bounds.bottom )
+                    }
+                    canvas.showCanvas()
+                    findViewById<TextView>(R.id.textStatus).text = "見つけました"
+                    pro.progress = 100
+                }
+                .addOnFailureListener(object : OnFailureListener {
+                    override fun onFailure(e:Exception){
+                        Log.d("debug","failuer")
+                    }
+                })
 
 
+        //pro.visibility = android.widget.ProgressBar.INVISIBLE
         //キャンバスをタッチしたときのイベント
         canvas.setOnTouchListener { v, event ->
 
@@ -127,8 +140,8 @@ class Main3Activity : AppCompatActivity() {
         }
 
         //キャンバスに写真を表示する
-        //canvas.showCanvas( newBitmap )
-        canvas.showCanvas( bitmap )
+        canvas.showCanvas( newBitmap )
+        //canvas.showCanvas( bitmap )
     }
     //Toolbarにtool_menuを追加する
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
