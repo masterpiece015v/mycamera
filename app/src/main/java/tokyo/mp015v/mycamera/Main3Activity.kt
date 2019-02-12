@@ -22,6 +22,7 @@ import com.eclipsesource.json.JsonObject
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
@@ -139,7 +140,14 @@ class Main3Activity : AppCompatActivity() {
                             for( face in faces ){
                                 val bounds = face.boundingBox
                                 //Log.d( "debug", bounds.toString() )
-                                canvas.addRectPoint( bounds.left,bounds.top,bounds.right,bounds.bottom )
+                                val smile = if( face.smilingProbability != FirebaseVisionFace.UNCOMPUTED_PROBABILITY){
+                                    "笑顔${face.smilingProbability*100}点"
+                                }else{
+                                    "笑顔0点"
+                                }
+                                canvas.addRectPoint( bounds.left,bounds.top,bounds.right,bounds.bottom)
+                                rects.addRect( Rect(Point(bounds.left,bounds.top),Point(bounds.right,bounds.bottom),smile))
+
                             }
                             canvas.showCanvas()
                             findViewById<TextView>(R.id.textStatus).text = "見つけました"
