@@ -34,12 +34,12 @@ class Main2Activity : AppCompatActivity() {
         const val CAMERA_PERMISSION_CODE = 2
         const val STORAGE_PERMISSION_CODE = 3
         const val Main3Activity_CODE = 4
+        var curPath:String? = null
     }
 
     lateinit var timeStamp:String
     lateinit var imageFileName:String
     lateinit var picPath:String
-    lateinit var curPath:String
     val dirMap = DirMap()
 
     //作るときの処理
@@ -60,9 +60,7 @@ class Main2Activity : AppCompatActivity() {
         )
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-
-        this.curPath = "casalack"
-
+        if( curPath == null) curPath = "casalack"
     }
 
     //表示するときの処理
@@ -72,7 +70,7 @@ class Main2Activity : AppCompatActivity() {
         //ファイルアクセス権のチェック
         if( checkStoragePermission() ){
             //サムネイルを表示
-            setListView(curPath)
+            setListView(curPath!!)
             //フォルダの作成は時間がかかるので非同期処理
             GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT){
                 createDirMap()
@@ -167,11 +165,11 @@ class Main2Activity : AppCompatActivity() {
         val args = arrayOf("%${filter_path}%")
         val cursor = contentResolver.query( MediaStore.Images.Media.EXTERNAL_CONTENT_URI,null,selection,args,"date_added desc")
         val listItem = ArrayList<ListItem>()
-        Log.d("***setListView***", "columncount:" + cursor.columnCount )
+        //Log.d("***setListView***", "columncount:" + cursor.columnCount )
 
-        cursor.columnNames.forEach {
-            Log.d("***setListView***" , "columnNames:" + it )
-        }
+        //cursor.columnNames.forEach {
+        //    Log.d("***setListView***" , "columnNames:" + it )
+        //}
 
         //画像がない場合は何もしない
         if( cursor.count > 0 ) {
@@ -210,7 +208,7 @@ class Main2Activity : AppCompatActivity() {
                     setClassName( "tokyo.mp015v.mycamera","tokyo.mp015v.mycamera.Main3Activity")
                     putExtra("path", item.path )
                     putExtra("size", item.size)
-                    putExtra( "curPath" , curPath)
+
                 }
                 //startActivity( intent )
                 startActivityForResult(intent , Main3Activity_CODE)
@@ -240,10 +238,7 @@ class Main2Activity : AppCompatActivity() {
             contentResolver.insert(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,contentValues
             )
-            this.curPath = "casalack"
-        }else if( requestCode == Main3Activity_CODE && resultCode == Activity.RESULT_OK){
-            //Main3Activityからの復帰
-            this.curPath = data!!.getStringExtra("curPath")
+            curPath = "casalack"
         }
     }
 
@@ -295,7 +290,6 @@ class Main2Activity : AppCompatActivity() {
                     }
                     //casalackのリストビューを表示する
                     setListView( "casalack" )
-
 
                 }else{
                     grantWriteStoragePermission()

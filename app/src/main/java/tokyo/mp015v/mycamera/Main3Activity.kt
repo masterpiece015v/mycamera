@@ -36,7 +36,6 @@ class Main3Activity : AppCompatActivity() {
     lateinit var canvas : MyCanvas
     val rects = Rects()
     lateinit var newBitmap : Bitmap
-    lateinit var curPath : String
 
     val highAccuracyOpts = FirebaseVisionFaceDetectorOptions.Builder()
             .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
@@ -55,7 +54,7 @@ class Main3Activity : AppCompatActivity() {
         //Toolbarを追加する
         val toolbar = findViewById<Toolbar>(R.id.toolbar2)
         setSupportActionBar( toolbar )
-        //supportActionBar!!.setDisplayHomeAsUpEnabled( true )
+        supportActionBar!!.setDisplayHomeAsUpEnabled( true )
 
         //キャンバスの設定
         canvas = this.findViewById<MyCanvas>(R.id.myCanvas1)
@@ -63,9 +62,10 @@ class Main3Activity : AppCompatActivity() {
         //インテントから画像のパスを取得する
         val path = intent.getStringExtra("path")
         val size = intent.getLongExtra("size",0)
-        this.curPath = intent.getStringExtra( "curPath")
+
         //画像のビットマップを作成する
         val inputStream = FileInputStream( File( path ) )
+
         //画像の圧縮
         val options = BitmapFactory.Options().apply{
             if( size > 4000000) {
@@ -80,7 +80,7 @@ class Main3Activity : AppCompatActivity() {
                 inSampleSize = 1
             }
         }
-        //val bitmap = BitmapFactory.decodeStream( inputStream ,null,options )
+
         val bitmap = BitmapFactory.decodeStream(inputStream)
 
         val bitmapWidth = bitmap.width
@@ -93,34 +93,6 @@ class Main3Activity : AppCompatActivity() {
 
         newBitmap = Bitmap.createScaledBitmap(bitmap,(bitmapWidth * scale).toInt(),(bitmapHeight*scale).toInt(),false)
 
-        val image = FirebaseVisionImage.fromBitmap( newBitmap )
-
-        val detector = FirebaseVision.getInstance()
-                .getVisionFaceDetector(highAccuracyOpts)
-
-        val pro = findViewById<ProgressBar>(R.id.progressBar)
-        pro.max = 100;
-        pro.progress = 0
-        //pro.visibility = android.widget.ProgressBar.VISIBLE
-        findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
-
-        val result = detector.detectInImage( image )
-                .addOnSuccessListener{ faces->
-                    Log.d("debug","success")
-                    for( face in faces ){
-                        val bounds = face.boundingBox
-                        ///Log.d( "debug", bounds. )
-                        canvas.addRectPoint( bounds.left,bounds.top,bounds.right,bounds.bottom )
-                    }
-                    canvas.showCanvas()
-                    findViewById<TextView>(R.id.textStatus).text = "見つけました"
-                    pro.progress = 100
-                }
-                .addOnFailureListener(object : OnFailureListener {
-                    override fun onFailure(e:Exception){
-                        Log.d("debug","failuer")
-                    }
-                })
 
 
         //pro.visibility = android.widget.ProgressBar.INVISIBLE
@@ -143,6 +115,7 @@ class Main3Activity : AppCompatActivity() {
         canvas.showCanvas( newBitmap )
         //canvas.showCanvas( bitmap )
     }
+
     //Toolbarにtool_menuを追加する
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.tool2_menu,menu )
@@ -154,7 +127,41 @@ class Main3Activity : AppCompatActivity() {
         val id = item!!.itemId
 
         when( id ){
-            R.id.action_smile -> {
+            //Firebaseを使う
+            R.id.action_smile ->{
+                val image = FirebaseVisionImage.fromBitmap( newBitmap )
+
+                val detector = FirebaseVision.getInstance()
+                        .getVisionFaceDetector(highAccuracyOpts)
+
+                //プログレスバー
+                val pro = findViewById<ProgressBar>(R.id.progressBar)
+                pro.max = 100;
+                pro.progress = 0
+
+
+                findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
+
+                val result = detector.detectInImage( image )
+                        .addOnSuccessListener{ faces->
+                            Log.d("debug","success")
+                            for( face in faces ){
+                                val bounds = face.boundingBox
+                                //Log.d( "debug", bounds.toString() )
+                                canvas.addRectPoint( bounds.left,bounds.top,bounds.right,bounds.bottom )
+                            }
+                            canvas.showCanvas()
+                            findViewById<TextView>(R.id.textStatus).text = "見つけました"
+                            pro.progress = 100
+                        }
+                        .addOnFailureListener(object : OnFailureListener {
+                            override fun onFailure(e:Exception){
+                                Log.d("debug","failuer")
+                            }
+                        })
+            }
+            //GCPを使う
+            R.id.action_cloud_up -> {
                 GlobalScope.launch(Dispatchers.Main,CoroutineStart.DEFAULT) {
                     val url: String = ENDPOINT_URL + "/images:annotate?key=" + API_KEY
                     val body: String =
@@ -207,11 +214,10 @@ class Main3Activity : AppCompatActivity() {
 
                 }
             }
-            R.id.action_back->{
+            android.R.id.home->{
                 //NavUtils.navigateUpFromSameTask(this)
-                val intent = Intent()
-                intent.putExtra("curPath",this.curPath )
-                setResult(Activity.RESULT_OK,intent)
+                //val intent = Intent()
+                //setResult(Activity.RESULT_OK,intent)
                 finish()
 
             }
