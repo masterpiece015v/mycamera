@@ -93,9 +93,6 @@ class Main3Activity : AppCompatActivity() {
 
         newBitmap = Bitmap.createScaledBitmap(bitmap,(bitmapWidth * scale).toInt(),(bitmapHeight*scale).toInt(),false)
 
-
-
-        //pro.visibility = android.widget.ProgressBar.INVISIBLE
         //キャンバスをタッチしたときのイベント
         canvas.setOnTouchListener { v, event ->
 
@@ -113,7 +110,7 @@ class Main3Activity : AppCompatActivity() {
 
         //キャンバスに写真を表示する
         canvas.showCanvas( newBitmap )
-        //canvas.showCanvas( bitmap )
+
     }
 
     //Toolbarにtool_menuを追加する
@@ -134,12 +131,6 @@ class Main3Activity : AppCompatActivity() {
                 val detector = FirebaseVision.getInstance()
                         .getVisionFaceDetector(highAccuracyOpts)
 
-                //プログレスバー
-                val pro = findViewById<ProgressBar>(R.id.progressBar)
-                pro.max = 100;
-                pro.progress = 0
-
-
                 findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
 
                 val result = detector.detectInImage( image )
@@ -152,8 +143,8 @@ class Main3Activity : AppCompatActivity() {
                             }
                             canvas.showCanvas()
                             findViewById<TextView>(R.id.textStatus).text = "見つけました"
-                            pro.progress = 100
                         }
+
                         .addOnFailureListener(object : OnFailureListener {
                             override fun onFailure(e:Exception){
                                 Log.d("debug","failuer")
