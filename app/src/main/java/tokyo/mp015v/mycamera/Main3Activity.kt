@@ -31,7 +31,7 @@ import java.io.FileInputStream
 
 class Main3Activity : AppCompatActivity() {
     val ENDPOINT_URL = "https://vision.googleapis.com/v1"
-    val API_KEY = ""
+    val API_KEY = "AIzaSyBhp2l8rLSb_oIZa-Wnr5X6CFeYmbDYl0w"
     val LIKELIHOOD = mapOf("VERY_LIKELY" to "100%" , "LIKELY" to "75%" , "POSSIBLE" to "50%" , "UNLIKELY" to "25%" , "VERY_UNLIKELY" to "0%")
     lateinit var likelihood : String
     lateinit var canvas : MyCanvas
@@ -134,6 +134,10 @@ class Main3Activity : AppCompatActivity() {
 
                 findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
 
+                //顔の四角を消す
+                canvas.delRectPoint()
+                canvas.showCanvas()
+
                 val result = detector.detectInImage( image )
                         .addOnSuccessListener{ faces->
                             Log.d("debug","success")
@@ -159,8 +163,14 @@ class Main3Activity : AppCompatActivity() {
                             }
                         })
             }
+
             //GCPを使う
             R.id.action_cloud_up -> {
+
+                findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
+                canvas.delRectPoint()
+                canvas.showCanvas()
+
                 GlobalScope.launch(Dispatchers.Main,CoroutineStart.DEFAULT) {
                     val url: String = ENDPOINT_URL + "/images:annotate?key=" + API_KEY
                     val body: String =
@@ -206,6 +216,7 @@ class Main3Activity : AppCompatActivity() {
                             likelihood = "楽しさ${LIKELIHOOD.get(joyLikelihood)}\n悲しさ${LIKELIHOOD.get(sorrowLikelihood)}\n怒り${LIKELIHOOD.get(angerLikelihood)}\n驚き${LIKELIHOOD.get(surpriseLikelihood)}"
                             rects.addRect(Rect(Point(x1,y1),Point(x2,y2),likelihood))
                         }
+                        findViewById<TextView>(R.id.textStatus).text = "見つけました"
                         canvas.showCanvas()
                     }else{
                         Toast.makeText(applicationContext,"顔がないのでは?",Toast.LENGTH_SHORT).show()

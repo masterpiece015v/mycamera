@@ -20,7 +20,7 @@ class MyCanvas(context : Context, attr : AttributeSet) : View( context,attr) {
             setColor(Color.argb(255, 0, 0, 0))
         }
         rectPaint.apply {
-            setColor(Color.argb(125, 255, 255, 0))
+            setColor(Color.argb(70, 255, 255, 0))
             //strokeWidth = 5.0F
             //style = Paint.Style.STROKE
         }
@@ -59,6 +59,11 @@ class MyCanvas(context : Context, attr : AttributeSet) : View( context,attr) {
     }
     fun addRectPoint( x1:Int , y1:Int ,x2:Int,y2:Int){
         rectPoint.add( RectPoint( Point(x1,y1),Point(x2,y2)))
+    }
+
+    fun delRectPoint(){
+        rectPoint.clear()
+
     }
     fun addTextPoint( text:String , x:Int,y:Int){
 
