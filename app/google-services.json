@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1030467517280",
+    "firebase_url": "https://sunlit-inn-228002.firebaseio.com",
+    "project_id": "sunlit-inn-228002",
+    "storage_bucket": "sunlit-inn-228002.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1030467517280:android:df21182878c9dc7f",
+        "android_client_info": {
+          "package_name": "tokyo.mp015v.mycamera"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1030467517280-jqcga2lvlp6othm4sb848u7mqkfd9v80.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfySWBEwWSTdkrXfWur1Dobj7wEoBWkLU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
