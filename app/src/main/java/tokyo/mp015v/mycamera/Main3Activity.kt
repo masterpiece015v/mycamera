@@ -132,7 +132,7 @@ class Main3Activity : AppCompatActivity() {
                 val detector = FirebaseVision.getInstance()
                         .getVisionFaceDetector(highAccuracyOpts)
 
-                findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
+                //findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
 
                 //顔の四角を消す
                 canvas.delRectPoint()
@@ -154,7 +154,7 @@ class Main3Activity : AppCompatActivity() {
 
                             }
                             canvas.showCanvas()
-                            findViewById<TextView>(R.id.textStatus).text = "見つけました"
+                            //findViewById<TextView>(R.id.textStatus).text = "見つけました"
                         }
 
                         .addOnFailureListener(object : OnFailureListener {
@@ -167,7 +167,9 @@ class Main3Activity : AppCompatActivity() {
             //GCPを使う
             R.id.action_cloud_up -> {
 
-                findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
+                //findViewById<TextView>(R.id.textStatus).text = "顔検索中・・・"
+                findViewById<ProgressBar>(R.id.progressBar).visibility = ProgressBar.VISIBLE
+
                 canvas.delRectPoint()
                 canvas.showCanvas()
 
@@ -216,7 +218,9 @@ class Main3Activity : AppCompatActivity() {
                             likelihood = "楽しさ${LIKELIHOOD.get(joyLikelihood)}\n悲しさ${LIKELIHOOD.get(sorrowLikelihood)}\n怒り${LIKELIHOOD.get(angerLikelihood)}\n驚き${LIKELIHOOD.get(surpriseLikelihood)}"
                             rects.addRect(Rect(Point(x1,y1),Point(x2,y2),likelihood))
                         }
-                        findViewById<TextView>(R.id.textStatus).text = "見つけました"
+                        //findViewById<TextView>(R.id.textStatus).text = "見つけました"
+                        findViewById<ProgressBar>(R.id.progressBar).visibility = ProgressBar.INVISIBLE
+
                         canvas.showCanvas()
                     }else{
                         Toast.makeText(applicationContext,"顔がないのでは?",Toast.LENGTH_SHORT).show()
